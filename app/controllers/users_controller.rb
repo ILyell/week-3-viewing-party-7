@@ -4,7 +4,12 @@ class UsersController < ApplicationController
   end 
 
   def show 
-    @user = User.find(params[:id])
+    if session[:user_id] == nil
+      flash[:error] = "You must be logged in to access your dashboard."
+      redirect_to root_path
+    else
+      @user = User.find(session[:user_id])
+    end
   end 
 
   def create 
@@ -19,6 +24,15 @@ class UsersController < ApplicationController
 
   def login_form
 
+  end
+  
+  def create_viewing_party
+    if session[:user_id] == nil
+      flash[:error] = "You must be logged in to create a viewing party"
+      redirect_to movie_path(session[:movie_id])
+    else
+      redirect_to root_path
+    end
   end
 
   def login
