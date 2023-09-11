@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe 'Landing Page' do
   before :each do 
-    user1 = User.create(name: "User One", email: "user1@test.com")
-    user2 = User.create(name: "User Two", email: "user2@test.com")
+    @user1 = User.create(name: "User One", email: "user1@test.com", password: "pass12345", password_confirmation: "pass12345")
+    @user2 = User.create(name: "User Two", email: "user2@test.com", password: "pass12345", password_confirmation: "pass12345")
     visit '/'
   end 
 
@@ -23,14 +23,41 @@ RSpec.describe 'Landing Page' do
   end 
 
   it 'lists out existing users' do 
-    user1 = User.create(name: "User One", email: "user1@test.com")
-    user2 = User.create(name: "User Two", email: "user2@test.com")
-
     expect(page).to have_content('Existing Users:')
 
     within('.existing-users') do 
-      expect(page).to have_content(user1.email)
-      expect(page).to have_content(user2.email)
+      expect(page).to have_content(@user1.email)
+      expect(page).to have_content(@user2.email)
     end     
   end 
+
+  it 'has a link to log in' do
+    
+    expect(page).to have_link("Log In")
+
+    click_link("Log In")
+
+    expect(current_path).to eq("/login")
+  end
+
+  it 'Shows a log out link if a user is logged in' do
+
+    user = User.create(name: "Ian", email: "funbucket13", password: "test", password_confirmation: "test")
+
+    visit root_path
+
+    click_on "Log In"
+
+    expect(current_path).to eq('/login')
+
+    fill_in :email, with: user.email
+    fill_in :password, with: user.password
+
+    click_on "Log In"
+
+    expect(current_path).to eq(root_path)
+
+    expect(page).to have_link("Log Out")
+
+  end
 end
